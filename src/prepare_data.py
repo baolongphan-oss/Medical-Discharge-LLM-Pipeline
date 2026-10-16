@@ -13,7 +13,10 @@ df = df[(df['medical_specialty'].str.contains("discharge summary", case=False))
         | (df['sample_name'].str.contains("discharge", case=False))]
 df = df[(df["transcription"].notna()) 
         & (df["transcription"].str.len() > 200)]
-df["transcription"] = df["transcription"].str.strip()
+
+for col in df.columns:
+    if str(df[col].dtype) in ["object", "str", "string"]:
+        df[col] = df[col].str.strip()
 
 print(f"Duplicated transcriptions: {df['transcription'].duplicated().sum()}")
 df.drop_duplicates(subset="transcription", inplace=True)
@@ -28,4 +31,4 @@ dev.to_csv(ROOT/"data"/"dev.csv", index=False)
 test.to_csv(ROOT/"data"/"test.csv", index=False)
 
 print(f"Dev: {len(dev)} notes | Test: {len(test)} notes")
-print(df.sample(5, random_state=1)[["medical_specialty", "sample_name"]])
+# print(df.sample(5, random_state=1)[["medical_specialty", "sample_name"]])
