@@ -1,9 +1,27 @@
-# Stage 1: Extraction (Oct 11–12)
+# Stage 1: Extraction
 # In src/schemas.py, write the Pydantic models: Medication (name, dose, frequency, status) and DischargeExtraction.
-# Write prompts/extract_v1.txt.
-# In src/extract.py, load a note, call the API, validate with Pydantic, and save the result to outputs/.
-# Add a short pause and retry between calls; the free tier allows 30 requests per minute.
-# Done when: it runs on all 10 dev notes and reports how many passed validation.
+from pydantic import BaseModel
+from typing import Literal
+
+# Define your data schema
+class Medication(BaseModel):
+    name: str
+    dose: str | None=None
+    frequency: str | None=None
+    status: Literal["new", "changed", "continued", "stopped", "unknown"] = "unknown"
+
+class DischargeExtraction(BaseModel):
+    final_diagnoses: list[str]
+    # history_of_present_illnesses: list[str]
+    medications: list[Medication]
+    procedures: list[str]
+    # hospital_course: list[str]
+    follow_up: list[str]
+
+# inspect the json schema
+# import json
+# print(json.dumps(DischargeExtraction.model_json_schema(), indent=2))
+
 # Stage 2: Patient translation (Oct 12–13)
 # In prompts/translate_v1.txt and src/translate.py, take the note plus the extracted medications and write 5th-grade instructions with a "Call your doctor if…" section.
 # Score readability with the textstat package (Flesch-Kincaid grade).
