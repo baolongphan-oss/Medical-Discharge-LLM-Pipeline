@@ -7,7 +7,6 @@ from openai import OpenAI, RateLimitError
 ROOT = Path(__file__).resolve().parent.parent
 load_dotenv(ROOT / ".env")
 
-MODEL_NAME = os.environ.get("LLM_MODEL")
 client = OpenAI(
     base_url=os.environ.get("LLM_BASE_URL"),
     api_key=os.environ.get("GROQ_API_KEY"),
