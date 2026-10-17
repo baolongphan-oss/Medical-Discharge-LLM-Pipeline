@@ -1,37 +1,21 @@
-# Write prompts/extract_v1.txt.
+# Write prompts/extract_{prompt_ver}.txt.
 # In src/extract.py, load a note, call the API, validate with Pydantic, and save the result to outputs/.
 # Add a short pause and retry between calls; the free tier allows 30 requests per minute.
 # Done when: it runs on all 10 dev notes and reports how many passed validation.
 import pandas as pd
-import time, json, os
+import time, json
 from schemas import DischargeExtraction
+from llm import call_with_retry
 from pydantic import ValidationError
 from openai import OpenAI, RateLimitError
 from pathlib import Path 
 from dotenv import load_dotenv
 
-def call_with_retry(messages, max_attempts=3):
-    for a in range(max_attempts):
-        try:
-            return client.chat.completions.create(
-                    model=model_name,
-                    temperature=0,
-                    response_format={"type": "json_object"},
-                    messages=messages,
-                )
-        except RateLimitError:
-            wait = 10*(a+1)
-            print(f"Rate limited, waiting {wait}s...")
-            time.sleep(wait)
-    raise RuntimeError(f"Still rate limited after {max_attempts} retries.")
-
-if __name__ == "__main__":
+def run_extraction(prompt_ver, model_name):
     ROOT = Path(__file__).resolve().parent.parent
     data = ROOT / "data" / "dev.csv"
     load_dotenv(ROOT / ".env")
-
-    model_name = os.environ.get("LLM_MODEL")
-    llm_dir_name = f"v1_{model_name.replace('/', '_')}"
+    llm_dir_name = f"{prompt_ver}_{model_name.replace('/', '_')}"
 
     out_dir = ROOT / "outputs" / llm_dir_name
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -40,13 +24,8 @@ if __name__ == "__main__":
     sample_notes = dev_df["transcription"]
 
     schema_text = json.dumps(DischargeExtraction.model_json_schema(), indent=2)
-    prompt_template = (ROOT / "prompts" / "extract_v1.txt").read_text()
+    prompt_template = (ROOT / "prompts" / f"extract_{prompt_ver}.txt").read_text()
     system_prompt = prompt_template.replace("{schema}", schema_text)
-
-    client = OpenAI(
-        base_url="https://api.groq.com/openai/v1",
-        api_key=os.environ.get("GROQ_API_KEY")
-    )
 
     passes = 0
     fail_records = []
@@ -56,7 +35,7 @@ if __name__ == "__main__":
             completion = call_with_retry([
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": note}
-                ])
+                ], json=True)
             extraction = completion.choices[0].message.content
             validated = DischargeExtraction.model_validate_json(extraction)
             print(f"Valid format for note_{idx+1:02d}!")
