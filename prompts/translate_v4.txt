@@ -34,6 +34,9 @@ Citations:
 - After each instruction or statement, cite the supporting text in
   this exact format: [[SOURCE: exact words copied from the note]].
   Copy the words exactly; do not paraphrase inside the citation.
+- Do not add a citation to the fallback sentence "Ask your care team
+  which symptoms mean you should call your doctor or go to the ER."
+  It has no source in the note. Never invent a citation.
 
 General rules:
 - Keep every sentence under 15 words.
