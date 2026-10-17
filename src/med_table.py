@@ -16,13 +16,16 @@ FREQ_LOOKUP = [
     (r"\bp\.?o\b\.?", "by mouth"),
     (r"\bq\.?\s?(\d+)\s?(?:h|hr|hrs|hours?)\b\.?", r"every \1 hours"),  # q4h, q.4h, q.4 hours
     (r"\bou\b\.?", "both eyes"),
+    # lone "daily" only: "once daily" / "twice daily" / "3 times daily" stay as written
+    (r"(?<!once )(?<!one )(?<!twice )(?<!times )\bdaily\b", "1 time a day"),
 ]
 
 # group title -> statuses that belong in it, in display order
 GROUPS = [
     ("New medicines", ["new"]),
     ("Changed medicines", ["changed"]),
-    ("Keep taking", ["continued", "unknown"]),
+    ("Keep taking", ["continued"]),
+    ("Your medicines", ["unknown"]),  # neutral: we don't know if it's new or continued
     ("STOP taking", ["stopped"]),
 ]
 
@@ -31,6 +34,9 @@ def plain_frequency(freq):
     """Replace known abbreviations with plain words; anything unmatched stays as written."""
     for pattern, plain in FREQ_LOOKUP:
         freq = re.sub(pattern, plain, freq, flags=re.IGNORECASE)
+    # p.r.n. already says "only when you need it", so drop a repeated "as needed"
+    if "only when you need it" in freq:
+        freq = re.sub(r"\s*\bas needed\b", "", freq, flags=re.IGNORECASE).strip()
     return freq
 
 

@@ -46,19 +46,34 @@ def test_nulls_and_new_duration():
 
 def test_continued_null_duration_is_blank():
     table = render_med_table([Medication(name="Lasix", dose="40 mg", frequency="daily", status="continued")])
-    assert "| Lasix | 40 mg | daily |  |" in table
+    assert "| Lasix | 40 mg | 1 time a day |  |" in table
 
 
-def test_group_order_and_unknown_in_keep_taking():
+def test_daily():
+    assert plain_frequency("daily") == "1 time a day"
+    # counted forms are not lone "daily", so they stay as written
+    assert plain_frequency("twice daily") == "twice daily"
+
+
+def test_prn_drops_duplicate_as_needed():
+    assert plain_frequency("p.r.n. as needed for pain") == "only when you need it for pain"
+    assert plain_frequency("q.4h p.r.n. as needed") == "every 4 hours only when you need it"
+
+
+def test_group_order_and_unknown_in_your_medicines():
     meds = [
         Medication(name="Aspirin", status="stopped"),
         Medication(name="Metformin", dose="500 mg", status="unknown"),
+        Medication(name="Lasix", dose="40 mg", status="continued"),
         Medication(name="Lisinopril", dose="20 mg", status="changed"),
         Medication(name="Keflex", dose="500 mg", status="new"),
     ]
     table = render_med_table(meds)
-    positions = [table.index(t) for t in ["New medicines", "Changed medicines", "Keep taking", "STOP taking"]]
+    headings = ["### New medicines", "### Changed medicines", "### Keep taking", "### Your medicines", "### STOP taking"]
+    positions = [table.index(h) for h in headings]
     assert positions == sorted(positions)
-    assert "| Metformin |" in table.split("### Keep taking")[1].split("###")[0]
+    # unknown goes under the neutral heading, not "Keep taking"
+    assert "| Metformin |" in table.split("### Your medicines")[1].split("###")[0]
+    assert "| Metformin |" not in table.split("### Keep taking")[1].split("###")[0]
     # stopped group shows the name column only
     assert "| Aspirin |" in table and "| Aspirin | " not in table
