@@ -8,6 +8,7 @@ class Medication(BaseModel):
     name: str
     dose: str | None=None
     frequency: str | None=None
+    duration: str | None=None # added after translate_v1 data inspection
     status: Literal["new", "changed", "continued", "stopped", "unknown"] = "unknown"
 
 class DischargeExtraction(BaseModel):

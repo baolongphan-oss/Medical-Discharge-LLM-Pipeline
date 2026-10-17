@@ -3,90 +3,111 @@
 # Score readability with the textstat package (Flesch-Kincaid grade).
 # Add the dose safety check: every dose from the extraction must appear unchanged in the patient version. Flag any that don't.
 # Done when: the 10 dev notes each produce a patient version, a grade level, and a pass/fail flag.
+
 import pandas as pd
 from pydantic import ValidationError
 from pathlib import Path
-import os, time, json, re
-from extract import DischargeExtraction
+import os, time, json, re, textstat
+from schemas import DischargeExtraction
 from dotenv import load_dotenv
-from openai import OpenAI
+from openai import OpenAI, RateLimitError
 
-ROOT = Path(__file__).resolve().parent.parent
-load_dotenv(ROOT / ".env")
+# check if there are any missing doses from the llm response
+def dose_check(meds, patient_text):
+    missing = []
+    text = patient_text.lower()
+    for med in meds:
+        if med.dose and med.dose.lower() not in text:
+            missing.append(f"{med.name}: {med.dose}")
+    return missing
 
-model_name = os.environ.get("LLM_MODEL")
-llm_dir_name = f"v1_{model_name.replace('/', '_')}"
+def call_with_retry(messages, max_attempts=3):
+    for a in range(max_attempts):
+        try:
+            return client.chat.completions.create(
+                    model=model_name,
+                    temperature=0,
+                    messages=messages,
+                )
+        except RateLimitError:
+            wait = 10*(a+1)
+            print(f"Rate limited, waiting {wait}s...")
+            time.sleep(wait)
+    raise RuntimeError(f"Still rate limited after {max_attempts} retries.")
 
-translate_dir_name = f"translate_v1_{model_name}"
-out_dir = ROOT / "outputs" / translate_dir_name
-out_dir.mkdir(parents=True, exist_ok=True)
+if __name__ == "__main__":
+    ROOT = Path(__file__).resolve().parent.parent
+    load_dotenv(ROOT / ".env")
+    model_name = os.environ.get("LLM_MODEL")
 
-data = ROOT / "data" / "dev.csv"
-dev_df = pd.read_csv(data)
-transcriptions = dev_df["transcriptions"]
+    translate_dir_name = f"translate_v1_{model_name.replace('/', '_')}"
+    out_dir = ROOT / "outputs" / translate_dir_name
+    out_dir.mkdir(parents=True, exist_ok=True)
 
-notes_path = Path(ROOT / "outputs" / llm_dir_name)
-note_files = sorted([f.name for f in notes_path.iterdir() if f.is_file() and re.match(f, r'^note_(\d{2}).json')])
-print(note_files)
+    data = ROOT / "data" / "dev.csv"
+    dev_df = pd.read_csv(data)
+    transcriptions = dev_df["transcription"]
 
-schema_text = json.dumps(DischargeExtraction.model_json_schema(), indent=2)
-prompt = (ROOT / "prompts" / "translate_v1.txt").read_text()
+    notes_path = Path(ROOT / "outputs" / f"v1_{model_name.replace('/', '_')}")
+    note_files = sorted([f.name for f in notes_path.iterdir() if f.is_file() and re.match(r'^note_(\d{2}).json', f.name)])
+    # print(note_files)
 
-# client = OpenAI(
-#     base_url="https://api.groq.com/openai/v1",
-#     api_key=os.environ.get("GROQ_API_KEY")
-# )
+    prompt = (ROOT / "prompts" / "translate_v1.txt").read_text()
 
-passes = 0
-fail_records = []
+    client = OpenAI(
+        base_url="https://api.groq.com/openai/v1",
+        api_key=os.environ.get("GROQ_API_KEY")
+    )
 
-# for idx, f_name in enumerate(files):
-#     with open(f_name, 'r', encoding='utf-8') as file:
-#         summary = json.load(file)['raw']
-#         original_transcription = transcriptions.iloc[idx]
-#         try:
-#             summary = DischargeExtraction.model_validate_json(summary)
+    passes = 0
+    fail_records = []
+    results = []
 
-#             user_msg = f"""
-#             DISCHARGE SUMMARY:
-#             {original_transcription}
+    for idx, f_name in enumerate(note_files):
+        with open(notes_path / f_name, 'r', encoding='utf-8') as file:
+            # get the summary extraction and original transcription
+            summary = DischargeExtraction.model_validate_json((notes_path / f_name).read_text())
+            original_transcription = transcriptions.iloc[idx]
+            try:
+                # Build the user message: the note + the medication list
+                user_msg = f"""DISCHARGE SUMMARY:
+    {original_transcription}
 
-#             MEDICATION LIST (copy doses exactly):
-#             {json.dumps([med.model_dump() for med in summary.medications])}
-#             """
+    MEDICATION LIST (copy doses exactly):
+    {json.dumps([med.model_dump() for med in summary.medications])}"""
 
-#             completion = client.chat.completions.create(
-#                 model=model_name,
-#                 temperature=0,
-#                 response_format={"type": "json_object"},
-#                 messages=[
-#                     {"role": "system", "content": prompt},
-#                     {"role": "user", "content": user_msg}
-#                 ]
-#             )
-#             extraction = completion.choices[0].message.content
-#             passes += 1
-#             with open(out_dir / f"note_{idx+1:02d}.json", "w", encoding="utf-8") as f:
-#                 f.write(extraction)
-#         except ValidationError as e:
-#             fail_records.append({"note": idx+1, "error": str(e), "raw": extraction})
-#             print(e)
-#         except Exception as e:
-#             fail_records.append({"note": idx+1, "error": str(e)})
-#             print(e)
-#     time.sleep(3)
+                # call the API to process the user message
+                completion = call_with_retry([
+                        {"role": "system", "content": prompt},
+                        {"role": "user", "content": user_msg}
+                    ])
+                patient_text = completion.choices[0].message.content
 
-print(f"Validation passes: {passes}/{len(note_files)}")
-print(fail_records)
+                # Score readability and run the dose check
+                grade = textstat.flesch_kincaid_grade(patient_text)
+                missing_doses = dose_check(summary.medications, patient_text)
 
-# For each dev note:
-#   1. Load the note text and its saved extraction JSON from outputs/
-#      (DischargeExtraction.model_validate_json(path.read_text()))
-#   2. Build the user message: the note + the medication list
-#      (validated.model_dump_json() for the meds)
-#   3. Call the API with translate_v1.txt as the system prompt.
-#      No response_format here: the output is plain text, not JSON.
-#   4. Score readability: textstat.flesch_kincaid_grade(text)
-#   5. Run the dose check (below)
-#   6. Save the patient text to outputs/translate_v1_<model>/note_XX.txt
-#   7. Print: note number, grade level, dose check pass/fail
+                passes += 1
+                results.append({
+                    "note": idx + 1,
+                    "grade": grade,
+                    "dose_check": "PASS" if not missing_doses else "FAIL",
+                    "missing_doses": "; ".join(missing_doses),
+                })
+                print(f"Working for note_{idx+1:02d}!")
+                # Save the patient text to outputs/translate_v1_<model>/note_XX.txt
+                with open(out_dir / f"note_{idx+1:02d}.txt", "w", encoding="utf-8") as f:
+                    f.write(patient_text)
+
+            except ValidationError as e:
+                fail_records.append({"note": idx+1, "error": str(e)})
+                print(e)
+            except Exception as e:
+                fail_records.append({"note": idx+1, "error": str(e)})
+                print(e)
+        time.sleep(15)
+
+    print(f"Validation passes: {passes}/{len(note_files)}")
+    print(fail_records)
+    # See note number, grade level, dose check pass/fail
+    pd.DataFrame(results).to_csv(out_dir / "summary.csv", index=False)
