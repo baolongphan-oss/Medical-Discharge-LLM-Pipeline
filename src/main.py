@@ -20,4 +20,4 @@ if __name__ == "__main__":
     print(f"Stage 1 extraction:  {extract_passes}/{extract_total} notes passed validation")
     print(f"Stage 2 translation: {stats['translated']}/{stats['total']} notes translated")
     print(f"Dose check:          {stats['dose_check_pass']}/{stats['translated']} passed")
-    print(f"Mean FK grade:       {stats['mean_grade']}")
+    print(f"Mean reading grade (Flesch-Kincaid): {stats['mean_grade']}")
