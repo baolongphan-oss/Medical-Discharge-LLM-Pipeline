@@ -25,7 +25,7 @@ GROUPS = [
     ("New medicines", ["new"]),
     ("Changed medicines", ["changed"]),
     ("Keep taking", ["continued"]),
-    ("Your medicines", ["unknown"]),  # neutral: we don't know if it's new or continued
+    ("Medicines to take", ["unknown"]),  # neutral: we don't know if it's new or continued
     ("STOP taking", ["stopped"]),
 ]
 

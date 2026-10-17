@@ -69,11 +69,11 @@ def test_group_order_and_unknown_in_your_medicines():
         Medication(name="Keflex", dose="500 mg", status="new"),
     ]
     table = render_med_table(meds)
-    headings = ["### New medicines", "### Changed medicines", "### Keep taking", "### Your medicines", "### STOP taking"]
+    headings = ["### New medicines", "### Changed medicines", "### Keep taking", "### Medicines to take", "### STOP taking"]
     positions = [table.index(h) for h in headings]
     assert positions == sorted(positions)
     # unknown goes under the neutral heading, not "Keep taking"
-    assert "| Metformin |" in table.split("### Your medicines")[1].split("###")[0]
+    assert "| Metformin |" in table.split("### Medicines to take")[1].split("###")[0]
     assert "| Metformin |" not in table.split("### Keep taking")[1].split("###")[0]
     # stopped group shows the name column only
     assert "| Aspirin |" in table and "| Aspirin | " not in table
