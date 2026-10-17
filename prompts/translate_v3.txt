@@ -33,4 +33,7 @@ General rules:
   Never substitute a different condition.
 - Do not add diagnoses, warning signs, or instructions that are not in
   the discharge summary.
-- Write plain text with simple section headings. No tables.
+- Write in Markdown. Start each section with a "##" heading using the
+  section name exactly as listed above (for example,
+  "## Your follow-up appointments"). Do not number the headings.
+  No tables.

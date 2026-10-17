@@ -33,6 +33,18 @@ def leaked_doses(meds, narrative):
     text = normalize(narrative)
     return [f"{med.name}: {med.dose}" for med in meds if med.dose and normalize(med.dose) in text]
 
+# v3: flag ANY dose-like text in the narrative (a number followed by a dose unit), even if it isn't in the extraction
+# DOSE_PATTERN matches a number, which can be a decimal, followed by mg, mcg, g, mL, mEq, unit(s), tablet(s) or puff(s). 
+# It ignores case and runs after NFKC normalization.
+# For example: 2 tablets, 40 mg, 1.5 ml and 5 puffs
+# regex: start with word (\b), then one or more digits (\d+), then decimal points if present ((?:\.\d+)?), 
+# zero or more spaces, pick one unit from the list, and add a word boundary (i.e. the unit ends the word with \b)
+
+DOSE_PATTERN = re.compile(r"\b\d+(?:\.\d+)?\s*(?:mg|mcg|g|ml|meq|units?|tablets?|puffs?|grams?|milligrams?)\b", re.IGNORECASE)
+
+def narrative_dose_leaks(narrative):
+    return DOSE_PATTERN.findall(normalize(narrative))
+
 # v3: put the medicine table after section 1 (before the first later-section heading)
 def build_v3_document(narrative, med_table):
     lines = narrative.split("\n")
@@ -95,23 +107,32 @@ MEDICATION LIST (copy doses exactly):
             grade = textstat.flesch_kincaid_grade(patient_text)
             if is_v3:
                 flagged = leaked_doses(summary.medications, patient_text)
+                pattern_leaks = narrative_dose_leaks(patient_text)
                 document = build_v3_document(patient_text, render_med_table(summary.medications))
                 out_file = f"note_{note_id}.md"
             else:
                 flagged = dose_check(summary.medications, patient_text)
+                pattern_leaks = []
                 document = patient_text
                 out_file = f"note_{note_id}.txt"
 
             passes += 1
+            dose_ok = not flagged and not pattern_leaks
             results.append({
                 "note_id": note_id,
                 "grade": grade,
-                "dose_check": "PASS" if not flagged else "FAIL",
-                "missing_doses": "; ".join(flagged),  # v3: doses that leaked into the narrative
+                "dose_check": "PASS" if dose_ok else "FAIL",
+                "missing_doses": "; ".join(flagged),  # v3: extraction doses that leaked into the narrative
+                "narrative_dose_leaks": "; ".join(pattern_leaks),  # v3 only: any dose-like text in the narrative
                 "n_medications": len(summary.medications),
             })
-            label = "dose leaked into narrative" if is_v3 else "missing"
-            print(f"[translate] note_{note_id}: DONE - grade {grade:.1f}, dose check {'PASS' if not flagged else f'FAIL ({label}: ' + '; '.join(flagged) + ')'}")
+            label = "extraction doses in narrative" if is_v3 else "missing"
+            problems = []
+            if flagged:
+                problems.append(f"{label}: " + "; ".join(flagged))
+            if pattern_leaks:
+                problems.append("dose-like text in narrative: " + "; ".join(pattern_leaks))
+            print(f"[translate] note_{note_id}: DONE - grade {grade:.1f}, dose check {'PASS' if dose_ok else 'FAIL (' + ' | '.join(problems) + ')'}")
             with open(out_dir / out_file, "w", encoding="utf-8") as f:
                 f.write(document)
 
@@ -126,7 +147,7 @@ MEDICATION LIST (copy doses exactly):
     print(f"[translate] Done ({split}, {translate_ver}, extraction {extract_ver}, {model_name}): {passes}/{len(note_files)} notes translated")
     print(f"[translate] Failures: {fail_records if fail_records else 'none'}")
     # See note id, grade level, dose check pass/fail
-    summary_df = pd.DataFrame(results, columns=["note_id", "grade", "dose_check", "missing_doses", "n_medications"])
+    summary_df = pd.DataFrame(results, columns=["note_id", "grade", "dose_check", "missing_doses", "narrative_dose_leaks", "n_medications"])
     summary_df.to_csv(out_dir / "summary.csv", index=False)
     print(f"[translate] Stage 2 complete. Patient texts and summary.csv saved to {out_dir}")
 
