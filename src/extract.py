@@ -35,17 +35,18 @@ def run_extraction(prompt_ver, model_name):
                 ], model_name, json_mode=True)
             extraction = completion.choices[0].message.content
             validated = DischargeExtraction.model_validate_json(extraction)
-            print(f"Valid format for note_{idx+1:02d}!")
+            print(f"[extract] note_{idx+1:02d}: PASS - saved to {out_dir.name}/note_{idx+1:02d}.json")
             passes += 1
             with open(out_dir / f"note_{idx+1:02d}.json", "w", encoding="utf-8") as f:
                 f.write(validated.model_dump_json(indent=4))
         except ValidationError as e:
             fail_records.append({"note": idx+1, "error": str(e), "raw": extraction})
-            print(e.json(indent=2))
+            print(f"[extract] note_{idx+1:02d}: FAIL - schema validation error:\n{e.json(indent=2)}")
         except Exception as e:
             fail_records.append({"note": idx+1, "error": str(e)})
-            print(e)
-        time.sleep(3)
+            print(f"[extract] note_{idx+1:02d}: FAIL - {type(e).__name__}: {e}")
+        time.sleep(5)
 
-    print(f"Validation passes: {passes}/{len(sample_notes)}")
-    print(fail_records)
+    print(f"[extract] Done ({prompt_ver}, {model_name}): {passes}/{len(sample_notes)} notes passed validation")
+    print(f"[extract] Failures: {fail_records if fail_records else 'none'}")
+    print(f"[extract] Stage 1 complete. Extractions saved to {out_dir}")

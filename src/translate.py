@@ -72,20 +72,21 @@ MEDICATION LIST (copy doses exactly):
                 "dose_check": "PASS" if not missing_doses else "FAIL",
                 "missing_doses": "; ".join(missing_doses),
             })
-            print(f"Working for note_{note_num:02d}!")
+            print(f"[translate] note_{note_num:02d}: DONE - grade {grade:.1f}, dose check {'PASS' if not missing_doses else 'FAIL (' + '; '.join(missing_doses) + ')'}")
             # Save the patient text to outputs/translate_v1_<model>/note_XX.txt
             with open(out_dir / f"note_{note_num:02d}.txt", "w", encoding="utf-8") as f:
                 f.write(patient_text)
 
         except ValidationError as e:
             fail_records.append({"note": note_num, "error": str(e)})
-            print(e)
+            print(f"[translate] note_{note_num:02d}: FAIL - could not load extraction {f_name}:\n{e}")
         except Exception as e:
             fail_records.append({"note": note_num, "error": str(e)})
-            print(e)
+            print(f"[translate] note_{note_num:02d}: FAIL - {type(e).__name__}: {e}")
         time.sleep(15)
 
-    print(f"Translated: {passes}/{len(note_files)}")
-    print(fail_records)
+    print(f"[translate] Done ({translate_ver}, extraction {extract_ver}, {model_name}): {passes}/{len(note_files)} notes translated")
+    print(f"[translate] Failures: {fail_records if fail_records else 'none'}")
     # See note number, grade level, dose check pass/fail
     pd.DataFrame(results).to_csv(out_dir / "summary.csv", index=False)
+    print(f"[translate] Stage 2 complete. Patient texts and summary.csv saved to {out_dir}")
