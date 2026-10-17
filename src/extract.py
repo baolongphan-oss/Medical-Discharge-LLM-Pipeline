@@ -7,14 +7,11 @@ import time, json
 from schemas import DischargeExtraction
 from llm import call_with_retry
 from pydantic import ValidationError
-from openai import OpenAI, RateLimitError
 from pathlib import Path 
-from dotenv import load_dotenv
 
 def run_extraction(prompt_ver, model_name):
     ROOT = Path(__file__).resolve().parent.parent
     data = ROOT / "data" / "dev.csv"
-    load_dotenv(ROOT / ".env")
     llm_dir_name = f"{prompt_ver}_{model_name.replace('/', '_')}"
 
     out_dir = ROOT / "outputs" / llm_dir_name
@@ -35,7 +32,7 @@ def run_extraction(prompt_ver, model_name):
             completion = call_with_retry([
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": note}
-                ], json=True)
+                ], model_name, json_mode=True)
             extraction = completion.choices[0].message.content
             validated = DischargeExtraction.model_validate_json(extraction)
             print(f"Valid format for note_{idx+1:02d}!")

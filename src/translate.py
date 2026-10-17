@@ -10,8 +10,6 @@ from pathlib import Path
 import time, json, re, textstat
 from schemas import DischargeExtraction
 from llm import call_with_retry
-from dotenv import load_dotenv
-from openai import OpenAI, RateLimitError
 
 # check if there are any missing doses from the llm response
 def dose_check(meds, patient_text):
@@ -24,7 +22,6 @@ def dose_check(meds, patient_text):
 
 def run_translation(extract_ver, translate_ver, model_name):
     ROOT = Path(__file__).resolve().parent.parent
-    load_dotenv(ROOT / ".env")
     translate_dir_name = f"translate_{translate_ver}_{model_name.replace('/', '_')}"
 
     out_dir = ROOT / "outputs" / translate_dir_name
@@ -35,7 +32,7 @@ def run_translation(extract_ver, translate_ver, model_name):
     transcriptions = dev_df["transcription"]
 
     notes_path = Path(ROOT / "outputs" / f"{extract_ver}_{model_name.replace('/', '_')}")
-    note_files = sorted([f.name for f in notes_path.iterdir() if f.is_file() and re.match(r'^note_(\d{2}).json', f.name)])
+    note_files = sorted([f.name for f in notes_path.iterdir() if f.is_file() and re.match(r'^note_(\d{2})\.json$', f.name)])
     # print(note_files)
 
     prompt = (ROOT / "prompts" / f"translate_{translate_ver}.txt").read_text()
@@ -44,11 +41,12 @@ def run_translation(extract_ver, translate_ver, model_name):
     fail_records = []
     results = []
 
-    for idx, f_name in enumerate(note_files):
+    for f_name in note_files:
+        note_num = int(re.match(r"^note_(\d{2})\.json$", f_name).group(1))
         try:
             # get the summary extraction and original transcription
             summary = DischargeExtraction.model_validate_json((notes_path / f_name).read_text())
-            original_transcription = transcriptions.iloc[idx]
+            original_transcription = transcriptions.iloc[note_num - 1]
             # Build the user message: the note + the medication list
             user_msg = f"""DISCHARGE SUMMARY:
 {original_transcription}
@@ -60,7 +58,7 @@ MEDICATION LIST (copy doses exactly):
             completion = call_with_retry([
                     {"role": "system", "content": prompt},
                     {"role": "user", "content": user_msg}
-                ])
+                ], model_name)
             patient_text = completion.choices[0].message.content
 
             # Score readability and run the dose check
@@ -69,25 +67,25 @@ MEDICATION LIST (copy doses exactly):
 
             passes += 1
             results.append({
-                "note": idx + 1,
+                "note": note_num,
                 "grade": grade,
                 "dose_check": "PASS" if not missing_doses else "FAIL",
                 "missing_doses": "; ".join(missing_doses),
             })
-            print(f"Working for note_{idx+1:02d}!")
+            print(f"Working for note_{note_num:02d}!")
             # Save the patient text to outputs/translate_v1_<model>/note_XX.txt
-            with open(out_dir / f"note_{idx+1:02d}.txt", "w", encoding="utf-8") as f:
+            with open(out_dir / f"note_{note_num:02d}.txt", "w", encoding="utf-8") as f:
                 f.write(patient_text)
 
         except ValidationError as e:
-            fail_records.append({"note": idx+1, "error": str(e)})
+            fail_records.append({"note": note_num, "error": str(e)})
             print(e)
         except Exception as e:
-            fail_records.append({"note": idx+1, "error": str(e)})
+            fail_records.append({"note": note_num, "error": str(e)})
             print(e)
-    time.sleep(15)
+        time.sleep(15)
 
-    print(f"Validation passes: {passes}/{len(note_files)}")
+    print(f"Translated: {passes}/{len(note_files)}")
     print(fail_records)
     # See note number, grade level, dose check pass/fail
     pd.DataFrame(results).to_csv(out_dir / "summary.csv", index=False)

@@ -13,8 +13,8 @@ client = OpenAI(
     api_key=os.environ.get("GROQ_API_KEY"),
 )
 
-def call_with_retry(messages, json_mode=False, max_attempts=3):
-    kwargs = {"model": MODEL_NAME, "temperature": 0, "messages": messages}
+def call_with_retry(messages, model, json_mode=False, max_attempts=3):
+    kwargs = {"model": model, "temperature": 0, "messages": messages}
     if json_mode:
         kwargs["response_format"] = {"type": "json_object"}
 
