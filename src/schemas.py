@@ -21,9 +21,3 @@ class DischargeExtraction(BaseModel):
 # inspect the json schema
 # import json
 # print(json.dumps(DischargeExtraction.model_json_schema(), indent=2))
-
-# Stage 2: Patient translation (Oct 12–13)
-# In prompts/translate_v1.txt and src/translate.py, take the note plus the extracted medications and write 5th-grade instructions with a "Call your doctor if…" section.
-# Score readability with the textstat package (Flesch-Kincaid grade).
-# Add the dose safety check: every dose from the extraction must appear unchanged in the patient version. Flag any that don't.
-# Done when: the 10 dev notes each produce a patient version, a grade level, and a pass/fail flag.
