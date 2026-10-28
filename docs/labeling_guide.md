@@ -96,6 +96,9 @@ Most plain discharge med lists will be `unknown`, and that is fine.
   or drug class. Otherwise skip.
 - **No discharge medications at all** (several therapy and neonatal notes):
   `"medications": []`. This is a valid label, not a missing one.
+- Tablet/unit count with no strength ("one", "one to two") goes in dose. (note_id=2114)
+- Keep the reason in frequency ("p.r.n. pain", "for difficulty breathing"). (note_id=2114)
+- Drug on the admission/home list but not mentioned at discharge, with no stop wording: don't label it. (note_id=132)
 
 Add new cases here as you hit them, with the note_id.
 

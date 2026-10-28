@@ -1,0 +1,51 @@
+{
+  "note_id": 2114,
+  "final_diagnoses": [],
+  "medications": [
+    {
+      "name": "Lasix",
+      "dose": "80 mg",
+      "frequency": "every morning",
+      "duration": null,
+      "status": "changed"
+    },
+    {
+      "name": "Lovenox",
+      "dose": "30 mg",
+      "frequency": "subcu daily",
+      "duration": "x2 weeks",
+      "status": "unknown"
+    },
+    {
+      "name": "Vicodin",
+      "dose": "5/500 mg one to two",
+      "frequency": "every four to six hours p.r.n pain",
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "Combivent",
+      "dose": null,
+      "frequency": "every four hours while awake for difficulty breathing",
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "Zithromax",
+      "dose": "250 mg",
+      "frequency": "daily",
+      "duration": "one week",
+      "status": "unknown"
+    },
+    {
+      "name": "guaifenesin long-acting",
+      "dose": "one",
+      "frequency": "twice a day b.i.d.",
+      "duration": null,
+      "status": "unknown"
+    }
+  ],
+  "procedures": [],
+  "follow_up": [],
+  "labeler_notes": "'Resume home medications' appears with no list. Lovenox status unknown: listed after ‘resume home medications, but…’ with no new/start wording. The ordering of name, dose, frequency, and duration usually shows up in that order, so scan the text, get the minimal amount for each detail, then that's the mark to move to the next label"
+}
