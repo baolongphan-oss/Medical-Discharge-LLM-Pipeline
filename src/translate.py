@@ -104,7 +104,7 @@ def check_citations(raw_text, note):
 def strip_citations(raw_text):
     return re.sub(r"[ \t]*\[\[SOURCE:.*?\]\]", "", raw_text, flags=re.DOTALL)
 
-def run_translation(extract_ver, translate_ver, model_name, split="dev"):
+def run_translation(extract_ver, translate_ver, model_name, split="dev", skip_existing=False):
     ROOT = Path(__file__).resolve().parent.parent
     model_dir = model_name.replace('/', '_')
     is_v3_plus = version_num(translate_ver) >= 3  # v3+: code-built medicine table
@@ -125,103 +125,121 @@ def run_translation(extract_ver, translate_ver, model_name, split="dev"):
     passes = 0
     fail_records = []
     results = []
+    skipped = 0
 
     for f_name in note_files:
         note_id = int(NOTE_FILE.match(f_name).group(1))
-        try:
-            if note_id not in transcriptions:
-                raise KeyError(f"note_id {note_id} is not in {split}.csv")
+        out_file = f"note_{note_id}.md" if is_v3_plus else f"note_{note_id}.txt"
+        out_file_path = out_dir / out_file
 
-            # get the summary extraction and original transcription
-            summary = DischargeExtraction.model_validate_json((notes_path / f_name).read_text())
-            original_transcription = transcriptions[note_id]
+        if skip_existing and out_file_path.is_file():
+            skipped += 1
+            print(f"[translate] note_{note_id}: SKIP - already exists")
+            continue
+        else:
+            try:
+                if note_id not in transcriptions:
+                    raise KeyError(f"note_id {note_id} is not in {split}.csv")
 
-            # Build the user message: v3+ sends only the note; v1/v2 also send the medication list
-            if is_v3_plus:
-                user_msg = f"DISCHARGE SUMMARY:\n{original_transcription}"
-            else:
-                user_msg = f"""DISCHARGE SUMMARY:
+                # get the summary extraction and original transcription
+                summary = DischargeExtraction.model_validate_json((notes_path / f_name).read_text())
+                original_transcription = transcriptions[note_id]
+
+                # Build the user message: v3+ sends only the note; v1/v2 also send the medication list
+                if is_v3_plus:
+                    user_msg = f"DISCHARGE SUMMARY:\n{original_transcription}"
+                else:
+                    user_msg = f"""DISCHARGE SUMMARY:
 {original_transcription}
 
 MEDICATION LIST (copy doses exactly):
 {json.dumps([med.model_dump() for med in summary.medications])}"""
 
-            # call the API to process the user message
-            completion = call_with_retry([
-                    {"role": "system", "content": prompt},
-                    {"role": "user", "content": user_msg}
-                ], model_name)
-            patient_text = completion.choices[0].message.content
+                # call the API to process the user message
+                completion = call_with_retry([
+                        {"role": "system", "content": prompt},
+                        {"role": "user", "content": user_msg}
+                    ], model_name)
+                patient_text = completion.choices[0].message.content
 
-            # v4+: verify citations, keep the raw output for auditing, then strip citations
-            # so every check below runs on the clean narrative only
-            quotes, unverified = [], []
-            if has_citations:
-                quotes, unverified = check_citations(patient_text, original_transcription)
-                with open(out_dir / f"note_{note_id}_audit.md", "w", encoding="utf-8") as f:
-                    f.write(patient_text)
-                patient_text = strip_citations(patient_text)
+                # v4+: verify citations, keep the raw output for auditing, then strip citations
+                # so every check below runs on the clean narrative only
+                quotes, unverified = [], []
+                if has_citations:
+                    quotes, unverified = check_citations(patient_text, original_transcription)
+                    with open(out_dir / f"note_{note_id}_audit.md", "w", encoding="utf-8") as f:
+                        f.write(patient_text)
+                    patient_text = strip_citations(patient_text)
 
-            # Score readability and run the dose check on the LLM text only (never the v3 table)
-            grade = textstat.flesch_kincaid_grade(patient_text)
-            if is_v3_plus:
-                flagged = leaked_doses(summary.medications, patient_text)
-                pattern_leaks = narrative_dose_leaks(patient_text)
-                document = build_v3_document(patient_text, render_med_table(summary.medications))
-                out_file = f"note_{note_id}.md"
-            else:
-                flagged = dose_check(summary.medications, patient_text)
-                pattern_leaks = []
-                document = patient_text
-                out_file = f"note_{note_id}.txt"
+                # Score readability and run the dose check on the LLM text only (never the v3 table)
+                grade = textstat.flesch_kincaid_grade(patient_text)
+                if is_v3_plus:
+                    flagged = leaked_doses(summary.medications, patient_text)
+                    pattern_leaks = narrative_dose_leaks(patient_text)
+                    document = build_v3_document(patient_text, render_med_table(summary.medications))
+                else:
+                    flagged = dose_check(summary.medications, patient_text)
+                    pattern_leaks = []
+                    document = patient_text
 
-            passes += 1
-            dose_ok = not flagged and not pattern_leaks
-            row = {
-                "note_id": note_id,
-                "grade": grade,
-                "dose_check": "PASS" if dose_ok else "FAIL",
-                "missing_doses": "; ".join(flagged),  # v3+: extraction doses that leaked into the narrative
-                "narrative_dose_leaks": "; ".join(pattern_leaks),  # v3+ only: any dose-like text in the narrative
-                "n_medications": len(summary.medications),
-            }
-            if has_citations:
-                row["n_citations"] = len(quotes)
-                row["unverified_citations"] = len(unverified)
-                row["unverified_quotes"] = "; ".join(unverified)
-            results.append(row)
-            label = "extraction doses in narrative" if is_v3_plus else "missing"
-            problems = []
-            if flagged:
-                problems.append(f"{label}: " + "; ".join(flagged))
-            if pattern_leaks:
-                problems.append("dose-like text in narrative: " + "; ".join(pattern_leaks))
-            cite_msg = f", citations {len(quotes) - len(unverified)}/{len(quotes)} verified" if has_citations else ""
-            print(f"[translate] note_{note_id}: DONE - grade {grade:.1f}, dose check {'PASS' if dose_ok else 'FAIL (' + ' | '.join(problems) + ')'}{cite_msg}")
-            with open(out_dir / out_file, "w", encoding="utf-8") as f:
-                f.write(document)
+                passes += 1
+                dose_ok = not flagged and not pattern_leaks
+                row = {
+                    "note_id": note_id,
+                    "grade": grade,
+                    "dose_check": "PASS" if dose_ok else "FAIL",
+                    "missing_doses": "; ".join(flagged),  # v3+: extraction doses that leaked into the narrative
+                    "narrative_dose_leaks": "; ".join(pattern_leaks),  # v3+ only: any dose-like text in the narrative
+                    "n_medications": len(summary.medications),
+                }
+                if has_citations:
+                    row["n_citations"] = len(quotes)
+                    row["unverified_citations"] = len(unverified)
+                    row["unverified_quotes"] = "; ".join(unverified)
+                results.append(row)
+                label = "extraction doses in narrative" if is_v3_plus else "missing"
+                problems = []
+                if flagged:
+                    problems.append(f"{label}: " + "; ".join(flagged))
+                if pattern_leaks:
+                    problems.append("dose-like text in narrative: " + "; ".join(pattern_leaks))
+                cite_msg = f", citations {len(quotes) - len(unverified)}/{len(quotes)} verified" if has_citations else ""
+                print(f"[translate] note_{note_id}: DONE - grade {grade:.1f}, dose check {'PASS' if dose_ok else 'FAIL (' + ' | '.join(problems) + ')'}{cite_msg}")
+                with open(out_file_path, "w", encoding="utf-8") as f:
+                    f.write(document)
 
-        except ValidationError as e:
-            fail_records.append({"note": note_id, "error": str(e)})
-            print(f"[translate] note_{note_id}: FAIL - could not load extraction {f_name}:\n{e}")
-        except Exception as e:
-            fail_records.append({"note": note_id, "error": str(e)})
-            print(f"[translate] note_{note_id}: FAIL - {type(e).__name__}: {e}")
-        time.sleep(15)
+            except ValidationError as e:
+                fail_records.append({"note": note_id, "error": str(e)})
+                print(f"[translate] note_{note_id}: FAIL - could not load extraction {f_name}:\n{e}")
+            except Exception as e:
+                fail_records.append({"note": note_id, "error": str(e)})
+                print(f"[translate] note_{note_id}: FAIL - {type(e).__name__}: {e}")
+            time.sleep(20)
 
-    print(f"[translate] Done ({split}, {translate_ver}, extraction {extract_ver}, {model_name}): {passes}/{len(note_files)} notes translated")
+    if skipped < len(note_files):
+        print(f"[translate] Done ({split}, {translate_ver}, extraction {extract_ver}, {model_name}): {passes}/{len(note_files)-skipped} notes translated")
+    else:
+        print("[extract] All files were already translated!")
     print(f"[translate] Failures: {fail_records if fail_records else 'none'}")
     # See note id, grade level, dose check pass/fail
     columns = ["note_id", "grade", "dose_check", "missing_doses", "narrative_dose_leaks", "n_medications"]
     if has_citations:
         columns += ["n_citations", "unverified_citations", "unverified_quotes"]
     summary_df = pd.DataFrame(results, columns=columns)
-    summary_df.to_csv(out_dir / "summary.csv", index=False)
+
+    summary_path = out_dir / "summary.csv"
+    existing_df = pd.DataFrame()
+    if summary_path.is_file():
+        existing_df = pd.read_csv(summary_path)
+
+    merged_df = pd.concat([existing_df, summary_df]).drop_duplicates(subset="note_id", keep="last").sort_values("note_id")
+    merged_df.to_csv(summary_path, index=False)
     print(f"[translate] Stage 2 complete. Patient texts and summary.csv saved to {out_dir}")
 
     return {
         "translated": passes,
-        "total": len(note_files),
-        "dose_check_pass": int((summary_df["dose_check"] == "PASS").sum()),
-        "mean_grade": round(summary_df["grade"].mean(), 1) if len(summary_df) else None,
+        "attempted": len(note_files) - skipped,
+        "total_notes": len(merged_df),
+        "dose_check_pass": int((merged_df["dose_check"] == "PASS").sum()),
+        "mean_grade": round(merged_df["grade"].mean(), 1) if len(merged_df) else None,
     }
