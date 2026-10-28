@@ -11,6 +11,7 @@ the changelog at the bottom, and re-check every label already written.
 - Label each note **before** running the pipeline on it. Do not open any
   model output for these notes until all 25 labels are committed.
 - One file per note: `labels/note_<note_id>.json`.
+- **Out of scope:** if the note is not a discharge to home/self-care (e.g. an admission note to another facility), do not label it. Record it in `labels/excluded.txt` with the reason. Excluded notes are not replaced. (note_id=2210)
 
 ## File format
 
@@ -99,6 +100,9 @@ Most plain discharge med lists will be `unknown`, and that is fine.
 - Tablet/unit count with no strength ("one", "one to two") goes in dose. (note_id=2114)
 - Keep the reason in frequency ("p.r.n. pain", "for difficulty breathing"). (note_id=2114)
 - Drug on the admission/home list but not mentioned at discharge, with no stop wording: don't label it. (note_id=132)
+- **No clinical inference for status.** Decide status only from (1) explicit wording in the note, or (2) comparing the discharge list with an admission/home list in the same note. Never from what is clinically likely (e.g. "the ulcer developed in hospital, so the cream is probably new"). If neither (1) nor (2) applies -> `unknown`. (note_id=3395, Xenaderm)
+- **Past-tense phrasing in a discharge list** ("He was on X") is still a discharge medication if it's listed under the discharge medications heading. The phrasing says nothing about status. (note_id=3395)
+- Infant formula / breast milk (NeoSure, EBM), supplements given as feeds: diet, not a medication. (note_id=1913)
 
 Add new cases here as you hit them, with the note_id.
 

@@ -1,0 +1,79 @@
+{
+  "note_id": 3400,
+  "final_diagnoses": [],
+  "medications": [
+    {
+      "name": "Coreg",
+      "dose": "12.5 mg",
+      "frequency": "p.o. b.i.d",
+      "duration": null,
+      "status": "continued"
+    },
+    {
+      "name": "Cozaar",
+      "dose": "50 mg",
+      "frequency": "p.o daily",
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "Aldactone",
+      "dose": "25 mg",
+      "frequency": "p.o. daily",
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "Synthroid",
+      "dose": "0.075 mg",
+      "frequency": "p.o. daily",
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "Carafate",
+      "dose": "1 gram",
+      "frequency": "p.o 4 times a day",
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "Claritin",
+      "dose": "10 mg",
+      "frequency": "p.o. daily",
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "Lasix",
+      "dose": "20 mg",
+      "frequency": "p.o. daily",
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "K-Dur",
+      "dose": "20 mEq",
+      "frequency": "p.o daily",
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "Prilosec",
+      "dose": "40 mg",
+      "frequency": "p.o. daily",
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "Zofran",
+      "dose": "4 mg",
+      "frequency": "p.o. q.4-6 hourly p.r.n.",
+      "duration": null,
+      "status": "unknown"
+    }
+  ],
+  "procedures": [],
+  "follow_up": [],
+  "labeler_notes": "Go to MEDICATIONS AND ADVICE ON DISCHARGE section. This note was long but easy to transcribe because the notes were pretty explicit by order of name, dose, frequency, duration."
+}

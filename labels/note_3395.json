@@ -1,0 +1,65 @@
+{
+  "note_id": 3395,
+  "final_diagnoses": [],
+  "medications": [
+    {
+      "name": "Calcium with vitamin D",
+      "dose": "1 tablet",
+      "frequency": "twice a day",
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "Ferrous sulfate",
+      "dose": "325 mg",
+      "frequency": "t.i.d",
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "Multivitamin",
+      "dose": "1",
+      "frequency": "daily",
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "nicotine patch",
+      "dose": "21 mg",
+      "frequency": "per 24 hour",
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "Seroquel",
+      "dose": "25 mg",
+      "frequency": "at bedtime",
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "Xenaderm",
+      "dose": null,
+      "frequency": null,
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "Vicodin",
+      "dose": null,
+      "frequency": "p.r.n",
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "Ativan",
+      "dose": "1 mg",
+      "frequency": "b.i.d",
+      "duration": null,
+      "status": "unknown"
+    }
+  ],
+  "procedures": [],
+  "follow_up": [],
+  "labeler_notes": "Go to 'MEDICATION: On discharge included:' and the medications will be listed numerically. No implicit interpretations whatsover, so keep the medication lists true to the transcription. For example, with Xenaderm, 'He was on' does not say continue, start or stop."
+}

@@ -7,17 +7,17 @@
       "dose": null,
       "frequency": null,
       "duration": null,
-      "status": "unknown"
+      "status": "new"
     },
     {
       "name": "enalapril",
       "dose": null,
       "frequency": null,
       "duration": null,
-      "status": "unknown"
+      "status": "continued"
     }
   ],
   "procedures": [],
   "follow_up": [],
-  "labeler_notes": "do not include any MEDICATIONS on admission; in the HOSPITAL COURSE scan for the section until discharge portion is mentioned, then look for medications. Statuses unknown: enalapril is a home med but no ‘continue’ wording; cipro was ‘switched over’ in hospital. Macrodantin/hydralazine on admission list only, not labeled. Lasix/Fortaz in-hospital only."
+  "labeler_notes": "do not include any MEDICATIONS on admission; in the HOSPITAL COURSE scan for the section until discharge portion is mentioned, then look for medications. Statuses unknown: enalapril is a home med but no ‘continue’ wording; cipro was ‘switched over’ in hospital. Macrodantin/hydralazine on admission list only, not labeled. Lasix/Fortaz in-hospital only. If a medication appears on both the admission list and the discharge medication list, put its status as 'continued'. Otherwise if a medication only appears in the discharge section but not the admission section, put status 'new'. However if there's no admission list nor explicit wording saying a discharge medication is new, just put 'unknown' to be safe."
 }

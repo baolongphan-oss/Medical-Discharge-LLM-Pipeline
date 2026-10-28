@@ -1,0 +1,30 @@
+{
+  "note_id": 2600,
+  "final_diagnoses": [],
+  "medications": [
+    {
+      "name": "Vicodin",
+      "dose": null,
+      "frequency": null,
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "Motrin",
+      "dose": null,
+      "frequency": null,
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "Macrodantin",
+      "dose": null,
+      "frequency": null,
+      "duration": null,
+      "status": "unknown"
+    }
+  ],
+  "procedures": [],
+  "follow_up": [],
+  "labeler_notes": "For DISCHARGE MEDICATIONS, I found no mentions of a prior admission list of medications, and there are no wording associated to each discharge medication, so I put status 'unknown'."
+}

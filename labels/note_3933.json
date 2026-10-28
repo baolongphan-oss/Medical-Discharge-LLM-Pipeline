@@ -1,0 +1,65 @@
+{
+  "note_id": 3933,
+  "final_diagnoses": [],
+  "medications": [
+    {
+      "name": "Protonic",
+      "dose": "40 mg",
+      "frequency": "daily",
+      "duration": null,
+      "status": "continued"
+    },
+    {
+      "name": "metoclopramide",
+      "dose": "10 mg",
+      "frequency": "every 6 hours",
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "Zyvox",
+      "dose": "600 mg",
+      "frequency": "daily",
+      "duration": "5 days",
+      "status": "unknown"
+    },
+    {
+      "name": "Diflucan",
+      "dose": "150 mg",
+      "frequency": "p.o. daily",
+      "duration": "3 days",
+      "status": "unknown"
+    },
+    {
+      "name": "Bumex",
+      "dose": "2 mg",
+      "frequency": "p.o daily",
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "Megace",
+      "dose": "400 mg",
+      "frequency": "p.o. b.i.d.",
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "Ensure",
+      "dose": "1 can",
+      "frequency": "t.i.d. with meals",
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "MiraLax",
+      "dose": "17 gm",
+      "frequency": "p.o daily",
+      "duration": null,
+      "status": "unknown"
+    }
+  ],
+  "procedures": [],
+  "follow_up": [],
+  "labeler_notes": "Go to DISCHARGE MEDICATION/INSTRUCTIONS section. This note was long but easy to transcribe because the notes were pretty explicit by order of name, dose, frequency, duration. Statuses tend to be unknown unless stated otherwise, like Protonic."
+}

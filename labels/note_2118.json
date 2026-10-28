@@ -1,0 +1,30 @@
+{
+  "note_id": 2118,
+  "final_diagnoses": [],
+  "medications": [
+    {
+      "name": "Medrol",
+      "dose": null,
+      "frequency": null,
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "Darvocet",
+      "dose": null,
+      "frequency": null,
+      "duration": null,
+      "status": "continued"
+    },
+    {
+      "name": "Flexeril",
+      "dose": null,
+      "frequency": null,
+      "duration": null,
+      "status": "continued"
+    }
+  ],
+  "procedures": [],
+  "follow_up": [],
+  "labeler_notes": "There was no DISCHARGE section after ADMISSION, but discharge medications tend to be put towards the end. Look for medications to send home (in this case, it's not explicitly stated if it's new or unknown so I put 'unknown') or continued medications"
+}
