@@ -1,0 +1,58 @@
+{
+  "note_id": 3403,
+  "final_diagnoses": [],
+  "medications": [
+    {
+      "name": "Prednisolone",
+      "dose": "60 mg",
+      "frequency": "orally once daily",
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "albuterol",
+      "dose": "2.5 mg",
+      "frequency": "nebulized every 4 hours",
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "Atrovent Respules",
+      "dose": null,
+      "frequency": "nebulized every 6 hours",
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "Pulmicort",
+      "dose": "500 micrograms",
+      "frequency": "nebulized twice every 8 hours",
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "Coumadin",
+      "dose": "5 mg",
+      "frequency": "orally once daily",
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "magnesium oxide",
+      "dose": "200 mg",
+      "frequency": "orally once daily",
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "ACE inhibitor", 
+      "dose": null, 
+      "frequency": null, 
+      "duration": null, 
+      "status": "stopped" 
+    }  
+  ],
+  "procedures": [],
+  "follow_up": [],
+  "labeler_notes": "Go to DISCHARGE MEDICATIONS section. Copy notes as is, in the order they appear. Special note: ACE inhibitor stopped (explicit discontinue). Avelox/prednisolone course, ventilation, BiPAP in hospital; BiPAP/O2 transfer settings are devices, not on med list."
+}

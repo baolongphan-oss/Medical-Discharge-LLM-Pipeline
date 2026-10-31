@@ -12,7 +12,7 @@
     {
       "name": "Cozaar",
       "dose": "50 mg",
-      "frequency": "p.o daily",
+      "frequency": "p.o. daily",
       "duration": null,
       "status": "unknown"
     },
@@ -33,7 +33,7 @@
     {
       "name": "Carafate",
       "dose": "1 gram",
-      "frequency": "p.o 4 times a day",
+      "frequency": "p.o. 4 times a day",
       "duration": null,
       "status": "unknown"
     },
@@ -54,7 +54,7 @@
     {
       "name": "K-Dur",
       "dose": "20 mEq",
-      "frequency": "p.o daily",
+      "frequency": "p.o. daily",
       "duration": null,
       "status": "unknown"
     },

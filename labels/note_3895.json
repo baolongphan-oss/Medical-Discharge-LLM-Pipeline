@@ -1,0 +1,142 @@
+{
+  "note_id": 3895,
+  "final_diagnoses": [],
+  "medications": [
+    {
+      "name": "Home oxygen",
+      "dose": "1 to 2 liters",
+      "frequency": "maintain O2 saturations at 89 to 91% at all times",
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "Ativan",
+      "dose": "1 mg",
+      "frequency": "p.o. t.i.d.",
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "Metformin",
+      "dose": "1000 mg",
+      "frequency": "p.o. b.i.d.",
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "Glucotrol",
+      "dose": "5 mg",
+      "frequency": "p.o. daily",
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "Spiriva",
+      "dose": "1 puff",
+      "frequency": "b.i.d.",
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "Lantus",
+      "dose": "25 units",
+      "frequency": "subcu q.a.m.",
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "Cardizem CD",
+      "dose": "180 mg",
+      "frequency": "p.o. q.a.m.",
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "Advair",
+      "dose": "250/50 mcg, 1 puff",
+      "frequency": "b.i.d.",
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "Iron",
+      "dose": "325 mg",
+      "frequency": "p.o. b.i.d.",
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "Aspirin",
+      "dose": "325 mg",
+      "frequency": "p.o. daily",
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "Lipitor",
+      "dose": "10 mg",
+      "frequency": "p.o. bedtime",
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "Digoxin",
+      "dose": "0.25 mg",
+      "frequency": "p.o. daily",
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "Lisinopril",
+      "dose": "20 mg",
+      "frequency": "p.o. q.a.m.",
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "DuoNeb",
+      "dose": null,
+      "frequency": "every 4 hours for the next several weeks, then q.6 h. thereafter",
+      "duration": null,
+      "status": "unknown"
+    },
+    {
+      "name": "Prednisone",
+      "dose": "40 mg",
+      "frequency": "p.o. q.a.m.",
+      "duration": "x3 days",
+      "status": "unknown"
+    },
+    {
+      "name": "Prednisone",
+      "dose": "30 mg",
+      "frequency": "p.o. q.a.m.",
+      "duration": "x3 days",
+      "status": "unknown"
+    },
+    {
+      "name": "Prednisone",
+      "dose": "20 mg",
+      "frequency": "p.o. q.a.m.",
+      "duration": "x5 days",
+      "status": "unknown"
+    },
+    {
+      "name": "Prednisone",
+      "dose": "10 mg",
+      "frequency": "p.o. q.a.m.",
+      "duration": "x14 days",
+      "status": "unknown"
+    },
+    {
+      "name": "Clindamycin",
+      "dose": "300 mg",
+      "frequency": "p.o. q.i.d.",
+      "duration": "x2 weeks",
+      "status": "unknown"
+    }
+  ],
+  "procedures": [],
+  "follow_up": [],
+  "labeler_notes": "No admission list, so all unknown. Oxygen labeled (numbered item on discharge list). DuoNeb one entry (schedule change, no dose). Prednisone split 40/30/20/10. Dispensing info dropped."
+}

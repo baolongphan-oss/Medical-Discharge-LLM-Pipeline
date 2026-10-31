@@ -54,8 +54,12 @@ Exclude:
   label each listed drug with status `continued`.
 - Non-drug items: oxygen, diet, therapy, devices (spirometer, stockings).
   Exception: a nebulizer medication with a named drug (e.g. albuterol neb)
-  counts.
+  counts. Or if they appear as a numbered item on the discharge medication list, then label them (extract_v4 includes every item on that list). (note_id=3895)
 - Vaccines given in hospital.
+- **With a discharge prescription** ("given prescription for pain medication"):
+  label it, name as written, other fields null. (note_id=3596)
+- **Mentioned only in a warning** ("no driving on narcotic pain medicines"):
+  skip. (note_id=3412)
 
 ## Fields
 
@@ -103,6 +107,8 @@ Most plain discharge med lists will be `unknown`, and that is fine.
 - **No clinical inference for status.** Decide status only from (1) explicit wording in the note, or (2) comparing the discharge list with an admission/home list in the same note. Never from what is clinically likely (e.g. "the ulcer developed in hospital, so the cream is probably new"). If neither (1) nor (2) applies -> `unknown`. (note_id=3395, Xenaderm)
 - **Past-tense phrasing in a discharge list** ("He was on X") is still a discharge medication if it's listed under the discharge medications heading. The phrasing says nothing about status. (note_id=3395)
 - Infant formula / breast milk (NeoSure, EBM), supplements given as feeds: diet, not a medication. (note_id=1913)
+- **Same drug, schedule changes but no dose** ("every 4 hours ... then q.6 h. thereafter"): one entry, full schedule in frequency. Split into multiple entries only when the dose changes (taper rule). (note_id=3895)
+- **Dispensing info** ("dispensed #64 with one refill"): leave it out. (note_id=3895)
 
 Add new cases here as you hit them, with the note_id.
 
@@ -118,6 +124,10 @@ Add new cases here as you hit them, with the note_id.
 - **Notes with zero gold medications:** excluded from recall. Any
   medication the model predicts there counts as a false positive and is
   reported separately as "invented medications on medication-free notes".
+- **Same drug listed more than once** (tapers, split doses): match on name
+**and** dose. A predicted entry that matches the name but none of the gold
+doses counts as a dose error on the closest unmatched entry, or a false
+positive if all gold entries for that drug are already matched. (note_id=3938)
 
 ## Post-hoc audit: unsupported instructions (Thursday, after labeling)
 

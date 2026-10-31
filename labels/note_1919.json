@@ -1,0 +1,30 @@
+{
+  "note_id": 1919,
+  "final_diagnoses": [],
+  "medications": [
+    {
+      "name": "Aspirin high dose",
+      "dose": "340 mg",
+      "frequency": "q.6h.",
+      "duration": "1 day",
+      "status": "unknown"
+    },
+    {
+      "name": "aspirin low dose",
+      "dose": "40 mg",
+      "frequency": "q.d.",
+      "duration": "14 days",
+      "status": "unknown"
+    },
+    {
+      "name": "Prevacid",
+      "dose": "15 mg",
+      "frequency": "p.o. once a day",
+      "duration": "5 days",
+      "status": "unknown"
+    }
+  ],
+  "procedures": [],
+  "follow_up": [],
+  "labeler_notes": "Go to DISCHARGE MEDICATION section. This note was pretty straightforward to transcribe."
+}

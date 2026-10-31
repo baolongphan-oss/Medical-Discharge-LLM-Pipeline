@@ -1,0 +1,58 @@
+{
+  "note_id": 3938,
+  "final_diagnoses": [],
+  "medications": [
+    {
+      "name": "Prednisone",
+      "dose": "40 mg",
+      "frequency": "p.o. daily",
+      "duration": "three days",
+      "status": "unknown"
+    },
+    {
+      "name": "Prednisone",
+      "dose": "30 mg",
+      "frequency": "p.o. daily",
+      "duration": "three days",
+      "status": "unknown"
+    },
+    {
+      "name": "Prednisone",
+      "dose": "20 mg",
+      "frequency": "p.o. daily",
+      "duration": "three days",
+      "status": "unknown"
+    },
+    {
+      "name": "Prednisone",
+      "dose": "10 mg",
+      "frequency": "p.o. daily",
+      "duration": "three days",
+      "status": "unknown"
+    },
+    {
+      "name": "Prednisone",
+      "dose": "5 mg",
+      "frequency": "p.o. daily",
+      "duration": "two days",
+      "status": "unknown"
+    },
+    {
+      "name": "Levaquin",
+      "dose": "750 mg",
+      "frequency": "p.o. daily",
+      "duration": "5 more days",
+      "status": "unknown"
+    },
+    {
+      "name": "Protonix",
+      "dose": "40 mg",
+      "frequency": "p.o. daily",
+      "duration": null,
+      "status": "unknown"
+    }
+  ],
+  "procedures": [],
+  "follow_up": [],
+  "labeler_notes": "Go to MEDICATIONS ON DISCHARGE section. Continue other current home medications’ with no home list, so no entries. No admission list, so all statuses unknown. Prednisone taper split into 5 entries per taper rule. Steroids/antibiotics started IV in hospital; the discharge versions are labeled from the discharge list."
+}
