@@ -9,7 +9,7 @@ from llm import call_with_retry
 from pydantic import ValidationError
 from pathlib import Path 
 
-def run_extraction(prompt_ver, model_name, split="dev", skip_existing=False):
+def run_extraction(prompt_ver, model_name, split="dev", skip_existing=False, note_ids=None):
     ROOT = Path(__file__).resolve().parent.parent
     data = ROOT / "data" / f"{split}.csv"
     llm_dir_name = f"{split}_{prompt_ver}_{model_name.replace('/', '_')}"
@@ -18,6 +18,8 @@ def run_extraction(prompt_ver, model_name, split="dev", skip_existing=False):
     out_dir.mkdir(parents=True, exist_ok=True)
 
     notes_df = pd.read_csv(data)
+    if note_ids is not None:
+        notes_df = notes_df[notes_df["note_id"].isin(note_ids)]
 
     schema_text = json.dumps(DischargeExtraction.model_json_schema(), indent=2)
     prompt_template = (ROOT / "prompts" / f"extract_{prompt_ver}.txt").read_text()

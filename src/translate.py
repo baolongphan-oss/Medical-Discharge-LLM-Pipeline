@@ -104,7 +104,7 @@ def check_citations(raw_text, note):
 def strip_citations(raw_text):
     return re.sub(r"[ \t]*\[\[SOURCE:.*?\]\]", "", raw_text, flags=re.DOTALL)
 
-def run_translation(extract_ver, translate_ver, model_name, split="dev", skip_existing=False):
+def run_translation(extract_ver, translate_ver, model_name, split="dev", skip_existing=False, note_ids=None):
     ROOT = Path(__file__).resolve().parent.parent
     model_dir = model_name.replace('/', '_')
     is_v3_plus = version_num(translate_ver) >= 3  # v3+: code-built medicine table
@@ -115,6 +115,9 @@ def run_translation(extract_ver, translate_ver, model_name, split="dev", skip_ex
 
     # look up each note's text by its stable note_id, never by position
     notes_df = pd.read_csv(ROOT / "data" / f"{split}.csv")
+    if note_ids is not None:
+        notes_df = notes_df[notes_df["note_id"].isin(note_ids)]
+
     transcriptions = dict(zip(notes_df["note_id"], notes_df["transcription"]))
 
     notes_path = ROOT / "outputs" / f"{split}_{extract_ver}_{model_dir}"
