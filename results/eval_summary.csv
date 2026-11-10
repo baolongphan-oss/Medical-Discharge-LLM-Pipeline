@@ -1,0 +1,3 @@
+version,notes,gold_meds,precision,recall,med_free_notes,invented_on_med_free,dose_acc,frequency_acc,duration_acc,status_acc,frequency_noroute_acc
+v3,24,91,0.9,0.89,8,3,0.951,0.407,0.914,0.852,0.827
+v4,24,91,0.901,0.901,8,5,0.939,0.415,0.89,0.817,0.841
