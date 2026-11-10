@@ -60,6 +60,7 @@ Exclude:
   label it, name as written, other fields null. (note_id=3596)
 - **Mentioned only in a warning** ("no driving on narcotic pain medicines"):
   skip. (note_id=3412)
+- Name = drug name only; drop the form (nebulizer, inhaler, tablet, cream).
 
 ## Fields
 
@@ -149,3 +150,4 @@ sentence in the note supports.
 - v1 (2026-10-27): initial rules.
 - v2 (2026-10-28): status rule aligned with extract_v4 (explicit wording, then admission-list comparison); 132 re-checked. Out-of-scope rule added (2210).
 - v3 (2026-10-31): unnamed meds with a discharge prescription labeled (3596); oxygen labeled when on the discharge list (3895); schedule-change-without-dose = one entry; dispensing info dropped; same-drug matching on name + dose (3938). Out-of-scope rule clarified to document type, not destination (it was misworded). All rule changes made before any test-set output was generated.
+- v4: form words stripped from names at eval time; found via 2114 (model: ‘Combivent nebulizer’).
