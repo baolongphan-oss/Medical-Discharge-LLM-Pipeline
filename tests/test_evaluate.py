@@ -1,4 +1,4 @@
-from src.evaluate import freq_key, key, name_key, match_meds, score_note
+from src.evaluator import freq_key, key, name_key, match_meds, score_note
 
 
 def med(name, dose=None, status="unknown"):

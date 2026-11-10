@@ -3,7 +3,7 @@
 Turns hospital discharge summaries into (1) a structured extraction (diagnoses, medications, procedures, follow-up) and (2) plain-language patient instructions. Python, OpenAI SDK on Groq (`openai/gpt-oss-120b`), Pydantic, pandas, textstat, pytest.
 
 ## Results (test set)
-24 MTSamples discharge summaries, hand-labeled for medications (91 meds; 8 notes have none). Prompts were frozen (`prompts-frozen-v4`) before the test set was run. Reproduce with `python -m src.evaluate`; see `results/`.
+24 MTSamples discharge summaries, hand-labeled for medications (91 meds; 8 notes have none). Prompts were frozen (`prompts-frozen-v4`) before the test set was run. Reproduce with `python -m src.evaluator`; see `results/`.
 
 **Medication extraction**
 
